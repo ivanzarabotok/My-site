@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Трекер полезных привычек — проект</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f172a;
+    --bg-soft: #1e293b;
+    --accent: #6366f1;
+    --accent2: #10b981;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #334155;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ---------- Навигация ---------- */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+    padding: 15px 0;
+  }
+
+  .nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    font-size: 20px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-decoration: none;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 25px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    transition: 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 100px 20px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(99,102,241,0.25), transparent 70%);
+    top: -200px;
+    right: -200px;
+    border-radius: 50%;
+    filter: blur(60px);
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(16,185,129,0.2), transparent 70%);
+    bottom: -150px;
+    left: -150px;
+    border-radius: 50%;
+    filter: blur(60px);
+  }
+
+  .hero > * { position: relative; z-index: 1; }
+
+  .hero-badge {
+    display: inline-block;
+    padding: 8px 18px;
+    background: rgba(99,102,241,0.15);
+    border: 1px solid rgba(99,102,241,0.4);
+    border-radius: 50px;
+    font-size: 14px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 25px;
+  }
+
+  .hero h1 {
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 25px;
+    background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    max-width: 900px;
+  }
+
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero p {
+    font-size: 22px;
+    color: var(--muted);
+    max-width: 650px;
+    margin-bottom: 40px;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .btn {
+    padding: 15px 32px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.25s;
+    border: none;
+    display: inline-block;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    color: white;
+    box-shadow: 0 10px 30px rgba(99,102,241,0.4);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(99,102,241,0.55);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 2px solid var(--border);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ---------- Секции ---------- */
+  section {
+    padding:
+00px 20px;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-title {
+    font-size: 42px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  .section-subtitle {
+    font-size: 18px;
+    color: var(--muted);
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 60px;
+  }
+
+  /* ---------- Проблема ---------- */
+  .problem {
+    background: var(--bg-soft);
+  }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+  }
+
+  .problem-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 35px 30px;
+    transition: 0.3s;
+  }
+
+  .problem-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent);
+  }
+
+  .problem-icon {
+    font-size: 42px;
+    margin-bottom: 20px;
+  }
+
+  .problem-card h3 {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+
+  .problem-card p {
+    color: var(--muted);
+    font-size: 16px;
+  }
+
+  /* ---------- Возможности ---------- */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+  }
+
+  .feature-card {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 35px 30px;
+    transition: 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: 0.3s;
+  }
+
+  .feature-card:hover::before { transform: scaleX(1); }
+
+  .feature-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent);
+  }
+
+  .feature-icon {
+    font-size: 36px;
+    margin-bottom: 18px;
+    display: inline-block;
+  }
+
+  .feature-card h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .feature-card p {
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  /* ---------- Технологии ---------- */
+  .tech {
+    background: var(--bg-soft);
+  }
+
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .tech-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 30px 20px;
+    text-align: center;
+    transition: 0.3s;
+  }
+
+  .tech-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+  }
+
+  .tech-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+  }
+
+  .tech-card h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .tech-card p {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  /* ---------- Статистика ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+  }
+
+  .stat {
+    text-align: center;
+    padding: 30px 20px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+
+  .stat-value {
+    font-size: 54px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 15px;
+    color: var(--muted);
+  }
+
+  /* ---------- Превью приложения ---------- */
+  .preview {
+    background: var(--bg);
+  }
+
+  .preview-mockup {
+    max-width: 800px;
+    margin: 40px auto 0;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+
+  .mockup-header {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 25px;
+  }
+
+  .mockup-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  .mockup-dot:nth-child(1) { background: #ef4444; }
+  .mockup-dot:nth-child(2) { background: #f59e0b; }
+  .mockup-dot:nth-child(3) { background: #10b981; }
+
+  .mockup-habit {
+    display: flex;
+    align-items: cen
+ter;
+    gap: 15px;
+    padding: 15px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+
+  .mockup-check {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--accent2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .mockup-text {
+    flex: 1;
+    font-size: 15px;
+  }
+
+  .mockup-progress {
+    width: 100px;
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .mockup-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 4px;
+  }
+
+  /* ---------- CTA ---------- */
+  .cta {
+    text-align: center;
+    padding: 120px 20px;
+    background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(16,185,129,0.15));
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cta h2 {
+    font-size: 48px;
+    font-weight: 800;
+    margin-bottom: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cta p {
+    font-size: 20px;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    padding: 50px 20px 30px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .footer-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .footer-brand {
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .footer-meta {
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  /* ---------- Анимация появления ---------- */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: 0.8s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ---------- Адаптив ---------- */
+  max-width: 768px {
+    .nav-links { display: none; }
+    .hero h1 { font-size: 42px; }
+    .hero p { font-size: 18px; }
+    .section-title { font-size: 32px; }
+    .cta h2 { font-size: 32px; }
+    section { padding: 70px 20px; }
+    .stat-value { font-size: 42px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Навигация -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">🎯 Трекер привычек</a>
+    <ul class="nav-links">
+      <li><a href="#problem">Проблема</a></li>
+      <li><a href="#features">Возможности</a></li>
+      <li><a href="#tech">Технологии</a></li>
+      <li><a href="#preview">Приложение</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+  <span class="hero-badge">🚀 Учебный проект · 10 класс</span>
+  <h1>Трекер <span>полезных</span> привычек</h1>
+  <p>Простое веб-приложение, которое помогает формировать полезные привычки через визуальный прогресс. Без регистрации, рекламы и сервера.</p>
+  <div class="hero-buttons">
+    <a href="#preview" class="btn btn-primary">Посмотреть приложение</a>
+    <a href="#features" class="btn btn-outline">Узнать больше</a>
+  </div>
+</header>
+
+<!-- Проблема -->
+<section class="problem" id="problem">
+  <div class="container">
+    <h2 class="section-title fade-in">Почему это важно</h2>
+    <p class="section-subtitle fade-in">Каждый хотя бы раз пытался начать новую жизнь, но бросал через неделю</p>
+    <div class="problem-grid">
+      <div class="problem-card fade-in">
+        <div class="problem-icon">📉</div>
+        <h3>80% бросают</h3>
+        <p>Большинство людей отказываются от новых привычек в первые две недели</p>
+      </div>
+      <div class="problem-card fade-in">
+        <div class="problem-icon">🧠</div>
+        <h3>Нужен прогресс</h3>
+        <p>Мозгу нужна визуальная обратная связь, чтобы закрепить действие</p>
+      </div>
+      <div class="problem-card fade-in">
+        <div class="problem-icon">📱</div>
+        <h3>Аналоги сложны</h3>
+<p>Готовые приложения перегружены рекламой и требуют регистрации</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Возможности -->
+<section id="features">
+  <div class="container">
+    <h2 class="section-title fade-in">Возможности приложения</h2>
+    <p class="section-subtitle fade-in">Всё, что нужно для отслеживания привычек — и ничего лишнего</p>
+    <div class="features-grid">
+      <div class="feature-card fade-in">
+        <span class="feature-icon">➕</span>
+        <h3>Добавление привычек</h3>
+        <p>Создавайте привычки с целью на неделю: спорт, чтение, учёба</p>
+      </div>
+      <div class="feature-card fade-in">
+        <span class="feature-icon">✅</span>
+        <h3>Отметки по дням</h3>
+        <p>Отмечайте выполнение в любой день недели одним кликом</p>
+      </div>
+      <div class="feature-card fade-in">
+        <span class="feature-icon">📊</span>
+        <h3>Визуальный прогресс</h3>
+        <p>Прогресс-бар и проценты показывают, насколько вы близки к цели</p>
+      </div>
+      <div class="feature-card fade-in">
+        <span class="feature-icon">💾</span>
+        <h3>Автосохранение</h3>
+        <p>Все данные хранятся в браузере и не теряются при закрытии</p>
+      </div>
+      <div class="feature-card fade-in">
+        <span class="feature-icon">🔄</span>
+        <h3>Новая неделя</h3>
+        <p>Сбросьте отметки одним кликом, чтобы начать новую неделю</p>
+      </div>
+      <div class="feature-card fade-in">
+        <span class="feature-icon">📱</span>
+        <h3>Адаптивность</h3>
+        <p>Приложение удобно работает на телефоне и на компьютере</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Технологии -->
+<section class="tech" id="tech">
+  <div class="container">
+    <h2 class="section-title fade-in">Технологии</h2>
+    <p class="section-subtitle fade-in">Веб-приложение работает прямо в браузере — без установки и сервера</p>
+    <div class="tech-grid">
+      <div class="tech-card fade-in">
+        <div class="tech-icon">📄</div>
+        <h3>HTML5</h3>
+        <p>Структура страницы</p>
+      </div>
+      <div class="tech-card fade-in">
+        <div class="tech-icon">🎨</div>
+        <h3>CSS3</h3>
+        <p>Grid, Flexbox, адаптив</p>
+      </div>
+      <div class="tech-card fade-in">
+        <div class="tech-icon">⚙️</div>
+        <h3>JavaScript</h3>
+        <p>Логика и события</p>
+      </div>
+      <div class="tech-card fade-in">
+        <div class="tech-icon">💾</div>
+        <h3>localStorage</h3>
+        <p>Хранение данных</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Превью приложения -->
+<section class="preview" id="preview">
+  <div class="container">
+    <h2 class="section-title fade-in">Как выглядит приложение</h2>
+    <p class="section-subtitle fade-in">Простой интерфейс — разберётся любой за 10 секунд</p>
+    <div class="preview-mockup fade-in">
+      <div class="mockup-header">
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+        <div class="mockup-dot"></div>
+      </div>
+      <div class="mockup-habit">
+        <div class="mockup-check">✓</div>
+        <div class="mockup-text">🏃 Зарядка утром</div>
+        <div class="mockup-progress"><div class="mockup-progress-fill" style="width: 100%"></div></div>
+      </div>
+      <div class="mockup-habit">
+        <div class="mockup-check">✓</div>
+        <div class="mockup-text">📖 Читать 20 минут</div>
+        <div class="mockup-progress"><div class="mockup-progress-fill" style="width: 80%"></div></div>
+      </div>
+      <div class="mockup-habit">
+        <div class="mockup-check" style="background: var(--border); color: var(--muted);">○</div>
+        <div class="mockup-text">💧 Пить 2 литра воды</div>
+        <div class="mockup-progress"><div class="mockup-progress-fill" style="width: 60%"></div></div>
+      </div>
+      <div class="mockup-habit">
+        <div class="mockup-check">✓</div>
+        <div class="mockup-text">🧘 Медитация 5 минут</div>
+        <div class="mockup-progress"><div class="mockup-progress-fill" style="width: 40%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Ст
+ атистика -->
+<section>
+  <div class="container">
+    <h2 class="section-title fade-in">Результаты тестирования</h2>
+    <p class="section-subtitle fade-in">Приложение протестировано на реальных пользователях</p>
+    <div class="stats">
+      <div class="stat fade-in">
+        <div class="stat-value">10</div>
+        <div class="stat-label">человек протестировали</div>
+      </div>
+      <div class="stat fade-in">
+        <div class="stat-value">4.7</div>
+        <div class="stat-label">оценка удобства из 5</div>
+      </div>
+      <div class="stat fade-in">
+        <div class="stat-value">8с</div>
+        <div class="stat-label">на добавление привычки</div>
+      </div>
+      <div class="stat fade-in">
+        <div class="stat-value">100%</div>
+        <div class="stat-label">работает офлайн</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="container">
+    <h2 class="fade-in">Маленькие шаги каждый день — большие перемены</h2>
+    <p class="fade-in">Попробуйте приложение и начните формировать полезные привычки уже сегодня</p>
+    <a href="#" class="btn btn-primary fade-in" style="font-size: 18px; padding: 18px 40px;">🚀 Открыть приложение</a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-content">
+    <div class="footer-brand">🎯 Трекер привычек</div>
+    <div class="footer-meta">Учебный проект ·Выполнял Швед Евгений ученик 10 «Л» класса · 2026</div>
+  </div>
+</footer>
+
+<script>
+  // Плавное появление элементов при скролле
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html> 1
